@@ -4,9 +4,18 @@ import plotly.express as px
 
 st.title("FEMA Disaster Relief Dashboard")
 
-# --- Load FEMA dataset ---
-df = pd.read_csv("IndividualAssistanceHousingRegistrantsLargeDisasters.csv")
+import urllib.request, os, time
 
+url = "https://storage.googleapis.com/info_450/IndividualAssistanceHousingRegistrantsLargeDisasters%20(1).csv"
+filename = "fema_disaster_data.csv"
+
+start = time.time()
+print(f"Downloading {filename}...")
+urllib.request.urlretrieve(url, filename)
+st.title("FEMA Disaster Relief Dashboard")
+
+# --- Load FEMA dataset ---
+df = pd.read_csv("fema_disaster_data.csv", nrows=300000)
 st.subheader("Data Preview")
 st.write(df.head())
 
