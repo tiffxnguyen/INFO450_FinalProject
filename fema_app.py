@@ -1,21 +1,27 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import urllib.request
+import time
+import os
 
 st.title("FEMA Disaster Relief Dashboard")
 
-import urllib.request, os, time
-
+# URL to the dataset
 url = "https://storage.googleapis.com/info_450/IndividualAssistanceHousingRegistrantsLargeDisasters%20(1).csv"
 filename = "fema_disaster_data.csv"
 
-start = time.time()
-print(f"Downloading {filename}...")
-urllib.request.urlretrieve(url, filename)
-st.title("FEMA Disaster Relief Dashboard")
+# Download CSV only if it doesn't exist locally
+if not os.path.exists(filename):
+    start = time.time()
+    st.info(f"Downloading dataset ({filename})...")
+    urllib.request.urlretrieve(url, filename)
+    st.success(f"Downloaded {filename} in {time.time() - start:.2f} seconds!")
 
-# --- Load FEMA dataset ---
-df = pd.read_csv("fema_disaster_data.csv", nrows=300000)
+# Load the dataset
+df = pd.read_csv("/content/fema_disaster_data.csv", nrows=300000)
+
+# --- Data preview ---
 st.subheader("Data Preview")
 st.write(df.head())
 
@@ -36,15 +42,13 @@ fig_box = px.box(
     x="tsaEligible",
     y="repairAmount",
     title="Repair Amount by TSA Eligibility",
-    labels={
-        "tsaEligible": "TSA Eligible (1 = Yes, 0 = No)",
-        "repairAmount": "Repair Amount"
-    }
+    labels={"tsaEligible": "TSA Eligible (1=Yes, 0=No)",
+            "repairAmount": "Repair Amount"}
 )
 st.plotly_chart(fig_box)
 
-# --- Optional text summary ---
+# --- Insight ---
 st.markdown(
-    "*Insight:* Compare the central tendency and spread of repair amounts "
-    "for TSA-eligible vs. non-eligible households."
+    "**Insight:** TSA-eligible households tend to show different repair cost patterns. "
+    "Compare the spread and median values between the groups."
 )
